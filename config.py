@@ -17,7 +17,7 @@ class Config:
     tfidf_max_features = 30000
 
     # Qwen
-    qwen_model_name = 'Qwen/Qwen2.5-1.5B'
+    qwen_model_name = 'Qwen/Qwen3-0.6B'
     qwen_max_length = 128
     qwen_batch_size = 16
     device          = 'cuda'

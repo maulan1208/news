@@ -33,5 +33,40 @@
         "samples": 5000
       }
     }
+  },
+  {
+    "timestamp": "2026-06-05 11:26:58",
+    "config": {
+      "alpha_tfidf": 0.1,
+      "alpha_qwen": 0.6,
+      "alpha_entity": 0.3,
+      "max_samples": 5000
+    },
+    "results": {
+      "tfidf": {
+        "AUC": 0.5796,
+        "nDCG@5": 0.2981,
+        "nDCG@10": 0.358,
+        "samples": 5000
+      },
+      "qwen": {
+        "AUC": 0.6071,
+        "nDCG@5": 0.3182,
+        "nDCG@10": 0.3755,
+        "samples": 5000
+      },
+      "entity": {
+        "AUC": 0.5478,
+        "nDCG@5": 0.2566,
+        "nDCG@10": 0.3209,
+        "samples": 5000
+      },
+      "hybrid": {
+        "AUC": 0.6118,
+        "nDCG@5": 0.3115,
+        "nDCG@10": 0.3689,
+        "samples": 5000
+      }
+    }
   }
 ]
