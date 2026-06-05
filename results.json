@@ -1,0 +1,37 @@
+[
+  {
+    "timestamp": "2026-06-05 10:54:12",
+    "config": {
+      "alpha_tfidf": 0.1,
+      "alpha_qwen": 0.6,
+      "alpha_entity": 0.3,
+      "max_samples": 5000
+    },
+    "results": {
+      "tfidf": {
+        "AUC": 0.5796,
+        "nDCG@5": 0.2981,
+        "nDCG@10": 0.358,
+        "samples": 5000
+      },
+      "qwen": {
+        "AUC": 0.6231,
+        "nDCG@5": 0.329,
+        "nDCG@10": 0.3862,
+        "samples": 5000
+      },
+      "entity": {
+        "AUC": 0.5478,
+        "nDCG@5": 0.2566,
+        "nDCG@10": 0.3209,
+        "samples": 5000
+      },
+      "hybrid": {
+        "AUC": 0.6354,
+        "nDCG@5": 0.3292,
+        "nDCG@10": 0.3854,
+        "samples": 5000
+      }
+    }
+  }
+]
