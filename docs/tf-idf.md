@@ -25,7 +25,7 @@ Chuẩn hóa giúp document dài không lấn át document ngắn.
 
 ### IDF — Inverse Document Frequency
 
-Đo độ "hiếm" (mức độ mang thông tin) của từ trên toàn bộ kho tài liệu. Dùng công thức **smooth IDF** (giống scikit-learn):
+Đo độ "hiếm" (mức độ mang thông tin) của từ trên toàn bộ kho tài liệu. Dùng công thức smooth IDF (giống scikit-learn):
 
 ```
 idf(t) = ln((N + 1) / (df(t) + 1)) + 1
@@ -33,8 +33,8 @@ idf(t) = ln((N + 1) / (df(t) + 1)) + 1
 
 Trong đó `N` là tổng số document. Việc cộng 1 vào tử và mẫu (smoothing) tránh chia cho 0 với từ chưa từng xuất hiện; cộng 1 ở cuối đảm bảo IDF luôn dương (từ xuất hiện ở mọi document vẫn không bị triệt tiêu hoàn toàn).
 
-- Từ hiếm (df = 1) → IDF cao nhất ≈ **11,15**
-- Từ phổ biến nhất (`the`, df = 39.330) → IDF thấp nhất ≈ **1,27**
+- Từ hiếm (df = 1) → IDF cao nhất ≈ 11,15
+- Từ phổ biến nhất (the, df = 39.330) → IDF thấp nhất ≈ 1,27
 
 ### TF-IDF
 
@@ -44,26 +44,21 @@ Trọng số cuối cùng của từ `t` trong document `d`:
 tfidf(t, d) = tf(t, d) × idf(t)
 ```
 
-Ý nghĩa: từ có giá trị TF-IDF cao khi nó **xuất hiện nhiều trong document này** nhưng **hiếm trong các document khác** → đặc trưng cho nội dung của document.
+Ý nghĩa: từ có giá trị TF-IDF cao khi nó xuất hiện nhiều trong document này nhưng hiếm trong các document khác → đặc trưng cho nội dung của document.
 
-### Biểu diễn sparse (thưa)
-
-Vì mỗi document chỉ chứa vài chục từ trong số ~55.000 từ của vocabulary, vector TF-IDF được lưu dạng **dict thưa** `{word_id: tfidf_value}` thay vì mảng dày 55.000 chiều — tiết kiệm bộ nhớ và tăng tốc tính toán.
 
 
 ## Luồng hoạt động
 
 ```
- Ghép title + abstract ──► Tiền xử lý (tokenize)
+ Ghép title + abstract ──> Tiền xử lý (tokenize)
                             │
-                            ▼
-              Đếm DF ──► Lọc vocabulary ──► word_to_index
+              Đếm DF, Lọc vocabulary, word_to_index
                             │
-                            ▼
                        Tính IDF
                             │
- Tính TF (từng document) ───┤
-                            ▼
+                Tính TF (từng document)
+                            │
               TF-IDF sparse cho từng document
 ```
 
@@ -73,7 +68,7 @@ Vì mỗi document chỉ chứa vài chục từ trong số ~55.000 từ của v
 
 ### 4.1. TF-IDF của một document (Document 5)
 
-> *"Should NFL be able to fine players for criticizing officiating? ..."*
+ "Should NFL be able to fine players for criticizing officiating? ..."
 
 Top từ có TF-IDF cao nhất:
 
