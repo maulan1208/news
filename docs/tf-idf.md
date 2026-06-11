@@ -3,6 +3,7 @@
 Là phương pháp biểu diễn văn bản dưới dạng vector, đánh giá tầm quan trọng của từ trong document dựa trên tần suất xuất hiện (TF) và độ hiếm của từ trên toàn bộ kho tài liệu (IDF). TF-IDF giúp tìm kiếm document tương tự bằng cách so sánh vector TF-IDF của chúng.
 
 ### Token
+Word token
 Đơn vị từ sau khi tiền xử lý văn bản (lowercase, bỏ ký tự đặc biệt, tách theo khoảng trắng).
 
 ### DF — Document Frequency
