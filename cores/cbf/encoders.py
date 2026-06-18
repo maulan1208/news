@@ -133,9 +133,11 @@ class QwenEncoder:
             return np.zeros(len(candidate_ids))
 
         hist_vecs = np.stack([self.embeds[nid] for nid in valid_hist])
-        user_vec  = hist_vecs.mean(axis=0)
-        user_vec  = user_vec / (np.linalg.norm(user_vec) + 1e-8) 
-
+        # user_vec  = hist_vecs.mean(axis=0)
+        # user_vec  = user_vec / (np.linalg.norm(user_vec) + 1e-8) 
+        weights   = np.arange(1, len(valid_hist) + 1, dtype=np.float32)
+        weights   /= weights.sum()
+        user_vec  = (weights[:, None] * hist_vecs).sum(axis=0)
         valid_mask = np.array([nid in self.embeds for nid in candidate_ids])
         valid_cands = [nid for nid, m in zip(candidate_ids, valid_mask) if m]
         if not valid_cands:

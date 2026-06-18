@@ -12,8 +12,8 @@ def ndcg(labels, scores, k):
 
 
 def _norm(s):
-    mn, mx = s.min(), s.max()
-    return (s - mn) / (mx - mn + 1e-8)
+    std = s.std()
+    return (s - s.mean()) / (std + 1e-8)
 
 
 def _compute_scores(mode, history, candidates, news_dict,
@@ -41,23 +41,47 @@ def _compute_scores(mode, history, candidates, news_dict,
             weights.append(alpha_entity)
 
         total = sum(weights)
-        scores = sum(w / total * s for w, s in zip(weights, parts))
-        return scores
+        return sum(w / total * s for w, s in zip(weights, parts))
 
     raise ValueError(f'mode không hợp lệ: {mode}')
+
+
+def _diverse_rerank(candidates, scores, news_dict, top_k, penalty=0.8):
+    scores_map = dict(zip(candidates, scores))
+    remaining  = list(candidates)
+    results    = []
+    seen_cats  = set()
+
+    while len(results) < top_k and remaining:
+        best = max(
+            remaining,
+            key=lambda nid: scores_map[nid] * (
+                penalty if news_dict.get(nid, {}).get('category', '') in seen_cats else 1.0
+            ),
+        )
+        results.append((best, scores_map[best]))
+        seen_cats.add(news_dict.get(best, {}).get('category', ''))
+        remaining.remove(best)
+
+    return results
 
 
 def recommend(user_history, all_candidates, news_dict,
               tfidf_enc=None, qwen_enc=None, entity_enc=None,
               mode='hybrid', top_k=10,
               alpha_tfidf=0.1, alpha_qwen=0.6, alpha_entity=0.3):
+    # Novelty: loại bài đã đọc khỏi candidates
+    history_set    = set(user_history)
+    all_candidates = [c for c in all_candidates if c not in history_set]
+
     scores = _compute_scores(
         mode, user_history, all_candidates, news_dict,
         tfidf_enc, qwen_enc, entity_enc,
         alpha_tfidf, alpha_qwen, alpha_entity,
     )
-    ranked = sorted(zip(all_candidates, scores), key=lambda x: x[1], reverse=True)
-    return ranked[:top_k]
+
+    # Diversity: greedy rerank với penalty category trùng
+    return _diverse_rerank(all_candidates, scores, news_dict, top_k)
 
 
 def evaluate(behaviors, news_dict,
