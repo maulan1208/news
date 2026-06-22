@@ -1,22 +1,50 @@
-## Cấu trúc
-news/
-├── config.py            Đường dẫn dữ liệu, tham số dùng chung 
-├── preprocess.py        Đọc data -> ma trận thưa user × news
-├── item.py              Model Item: chuẩn hoá vector + cosine similarity
-├── recommend.py         Demo gợi ý theo history
-├── evaluate.py          Đánh giá: AUC, MRR, nDCG@5, nDCG@10 
-├── results.json         Kết quả đánh giá 
-├── README.md
-└── data/
-    ├── raw/       
-    │   ├── MINDsmall_train/   
-    │   └── MINDsmall_dev/     
-    └── processed/       
-        ├── user_item.npz      
-        ├── user2idx.pkl       
-        └── news2idx.pkl       
+# Collaborative Filtering (CF)
+Những tin được cùng nhóm người đọc thì liên quan đến nhau". Không dùng nội dung bài viết, chỉ dùng lịch sử tương tác user–tin.
 
-## Nguyên lý model (Item-based)
-- Biểu diễn tin tức: mỗi tin là một vector trên không gian user - vector[i] = 1 nếu user i đã đọc tin đó, ngược lại 0. Hai tin được cùng một nhóm user đọc thì vector của chúng gần nhau → giống nhau.
-- Độ giống nhau giữa hai tin = cosine similarity giữa hai vector. Vì mọi vector tin đều được L2-normaliz (đưa về độ dài 1) trong fit(), nên dot product giữa chúng chính là cosine similarity.
-- Tránh ma trận item-item khổng lồ: thay vì tính sẵn ma trận similarity n_items × n_items (tốn bộ nhớ), gom history của user thành một profile vector rồi so từng tin candidate với profile đó.
+Có 2 thuật toán cùng chung interface
+
+| File | Thuật toán | Kiểu |
+|------|-----------|------|
+| `item.py` | Item-based CF | memory-based (không train) |
+| `mf.py` | Matrix Factorization | model-based (học vector ẩn) |
+
+## Mô tả
+
+1. **`config.py`**: đường dẫn dữ liệu + tham số. Đọc trước để biết file nào nằm ở đâu.
+2. **`preprocess.py`**: biến `behaviors.tsv` thành ma trận thưa user × news. Hiểu dữ liệu đầu vào.
+3. **`mf.py`** (hoặc `item.py`): cách model học và chấm điểm.
+4. **`recommend.py`** / **`evaluate.py`**: dùng model để gợi ý và đo chất lượng.
+
+- docs/cf/cf.md (tổng quan CF) và docs/cf/mf.md (Matrix Factorization).
+
+## Luồng chạy
+
+```
+behaviors.tsv
+    │  preprocess.py  
+    ▼
+user_item.npz + *.pkl   ma trận thưa user × news
+    │  mf.py            học vector ẩn P, Q
+    ▼
+mf_factors.npz
+    │  recommend.py / evaluate.py
+    ▼
+gợi ý top-K   /   đánh giá  → results.json
+```
+
+## Cấu trúc
+
+```
+cores/cf/
+├── config.py        đường dẫn dữ liệu + tham số
+├── preprocess.py    behaviors.tsv → ma trận thưa user × news
+├── item.py          ItemCF (memory-based)
+├── mf.py            Matrix Factorization (model-based)
+├── recommend.py     demo gợi ý theo history
+├── evaluate.py      đánh giá: AUC, MRR, nDCG@5, nDCG@10
+└── results.json     lịch sử kết quả đánh giá
+
+data/                
+├── raw/             
+└── processed/cf/    user_item.npz, *.pkl, mf_factors.npz
+```
