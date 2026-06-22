@@ -13,5 +13,13 @@ USER_ITEM_MATRIX = PROCESSED_DIR / "user_item.npz"
 USER2IDX_PATH = PROCESSED_DIR / "user2idx.pkl"
 NEWS2IDX_PATH = PROCESSED_DIR / "news2idx.pkl"
 
+# Matrix Factorization (model-based) — factors học được trong mf.py
+MF_FACTORS_PATH = PROCESSED_DIR / "mf_factors.npz"
+MF_DIM = 64            # số chiều không gian latent (vector ẩn k chiều)
+MF_EPOCHS = 20         # số vòng lặp qua toàn bộ tương tác dương
+MF_LR = 0.05           # learning rate cho SGD (gradient tự tính tay)
+MF_REG = 1e-2          # hệ số phạt L2 (chống overfit)
+MF_BATCH_SIZE = 8192   # số cặp (user, item) mỗi bước SGD
+
 TOP_K = 10
 EVAL_BATCH_SIZE = 256

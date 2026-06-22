@@ -1,7 +1,7 @@
 import argparse
 import pandas as pd
 import config
-from item import ItemCF
+from mf import MatrixFactorizationCF
 
 NEWS_COLUMNS = [
     "news_id", "category", "subcategory", "title",
@@ -58,7 +58,7 @@ def main():
     parser.add_argument("--top-k", type=int, default=config.TOP_K)
     args = parser.parse_args()
 
-    model = ItemCF().fit()
+    model = MatrixFactorizationCF().fit()
     titles = load_titles()
 
     if args.history:

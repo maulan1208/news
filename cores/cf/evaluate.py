@@ -8,7 +8,7 @@ import pandas as pd
 from scipy.stats import rankdata
 
 import config
-from item import ItemCF
+from mf import MatrixFactorizationCF
 
 BEHAVIOR_COLUMNS = ["impression_id", "user_id", "time", "history", "impressions"]
 
@@ -86,7 +86,7 @@ def evaluate(limit=None, batch_size=config.EVAL_BATCH_SIZE, output="results.json
     if limit:
         df = df.head(limit)
 
-    model = ItemCF().fit()
+    model = MatrixFactorizationCF().fit()
 
     auc_scores, mrr_scores, ndcg5_scores, ndcg10_scores = [], [], [], []
     rows = list(zip(df["history"], df["impressions"]))
@@ -139,7 +139,7 @@ def evaluate(limit=None, batch_size=config.EVAL_BATCH_SIZE, output="results.json
     return results
 
 def main():
-    parser = argparse.ArgumentParser(description="Đánh giá ItemCF trên dev set")
+    parser = argparse.ArgumentParser(description="Đánh giá Matrix Factorization trên dev set")
     parser.add_argument("--limit", type=int, default=None,
                         help="Chỉ đánh giá N impression đầu.")
     parser.add_argument("--batch-size", type=int, default=config.EVAL_BATCH_SIZE,
