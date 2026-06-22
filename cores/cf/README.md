@@ -1,5 +1,5 @@
 # Collaborative Filtering (CF)
-Những tin được cùng nhóm người đọc thì liên quan đến nhau". Không dùng nội dung bài viết, chỉ dùng lịch sử tương tác user–tin.
+Những tin được cùng nhóm người đọc thì liên quan đến nhau" Không dùng nội dung bài viết, chỉ dùng lịch sử tương tác user–tin
 
 Có 2 thuật toán cùng chung interface
 
@@ -10,10 +10,10 @@ Có 2 thuật toán cùng chung interface
 
 ## Mô tả
 
-1. **`config.py`**: đường dẫn dữ liệu + tham số. Đọc trước để biết file nào nằm ở đâu.
-2. **`preprocess.py`**: biến `behaviors.tsv` thành ma trận thưa user × news. Hiểu dữ liệu đầu vào.
+1. **`config.py`**: đường dẫn dữ liệu + tham số
+2. **`preprocess.py`**: biến `behaviors.tsv` thành ma trận thưa user × news. Hiểu dữ liệu đầu vào
 3. **`mf.py`** (hoặc `item.py`): cách model học và chấm điểm.
-4. **`recommend.py`** / **`evaluate.py`**: dùng model để gợi ý và đo chất lượng.
+4. **`recommend.py`** / **`evaluate.py`**: dùng model để gợi ý và đo chất lượng
 
 - docs/cf/cf.md (tổng quan CF) và docs/cf/mf.md (Matrix Factorization).
 
