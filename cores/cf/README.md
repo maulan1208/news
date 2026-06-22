@@ -16,7 +16,8 @@ Có 2 thuật toán cùng chung interface
 4. **`recommend.py`** / **`evaluate.py`**: dùng model để gợi ý và đo chất lượng
 
 - docs/cf/cf.md (tổng quan CF) và docs/cf/mf.md (Matrix Factorization).
-
+                                          |
+                                          mf.ipynb  
 ## Luồng chạy
 
 ```
