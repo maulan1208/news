@@ -145,3 +145,4 @@ def _sanity_check(model, seed=0):
 if __name__ == "__main__":
     model = MatrixFactorizationCF().fit(force_retrain=True)
     _sanity_check(model)
+

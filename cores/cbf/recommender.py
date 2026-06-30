@@ -121,3 +121,101 @@ def evaluate(behaviors, news_dict,
         'nDCG@10': round(np.mean(ndcg10s), 4),
         'samples': len(aucs),
     }
+
+
+
+def _load_encoders(cfg):
+    """Load 3 encoder từ cache; báo lỗi rõ nếu thiếu (cần chạy main.py để build)."""
+    import os
+    from encoders import TFIDFEncoder, QwenEncoder, EntityEncoder
+
+    missing = [p for p in (cfg.cache_tfidf, cfg.cache_qwen, cfg.cache_entity)
+               if not os.path.exists(p)]
+    if missing:
+        raise FileNotFoundError(
+            'Thiếu cache encoder:\n  ' + '\n  '.join(missing) +
+            '\n=> Chạy `python main.py` một lần để build encoder trước.')
+
+    tfidf = TFIDFEncoder.load(cfg.cache_tfidf)
+    qwen = QwenEncoder(cfg); qwen.load(cfg.cache_qwen)
+    entity = EntityEncoder(cfg); entity.load(cfg.cache_entity)
+    return tfidf, qwen, entity
+
+
+def _show(news_dict, history, recs):
+    print(f'\nHistory:')
+    for nid in history[:5]:
+        print(f'  - {nid}: {news_dict.get(nid, {}).get("title", "?")}')
+    if not recs:
+        print('Không có gợi ý.')
+        return
+    print(f'\nTop {len(recs)} gợi ý:')
+    for rank, (nid, score) in enumerate(recs, 1):
+        n = news_dict.get(nid, {})
+        print(f'  {rank}. [{score:.3f}] ({n.get("category", "?")}) {n.get("title", "?")}')
+
+
+def main():
+    import argparse
+    from config import Config
+    from preprocess import load_and_cache, load_behaviors
+
+    parser = argparse.ArgumentParser(description='CBF recommender (chạy riêng, không evaluate)')
+    parser.add_argument('--user-index', type=int, default=None,
+                        help='Index user trong dev behaviors để gợi ý.')
+    parser.add_argument('--history', default=None,
+                        help='Tự nhập history, vd "N1 N2 N3". Candidate = toàn bộ news.')
+    parser.add_argument('--mode', default='hybrid',
+                        choices=['tfidf', 'qwen', 'entity', 'hybrid'])
+    parser.add_argument('--top-k', type=int, default=None)
+    args = parser.parse_args()
+
+    cfg = Config()
+    top_k = args.top_k or cfg.top_k
+    news_dict = load_and_cache(cfg)
+    tfidf, qwen, entity = _load_encoders(cfg)
+
+    def rec(history, candidates):
+        return recommend(
+            user_history=history, all_candidates=candidates, news_dict=news_dict,
+            tfidf_enc=tfidf, qwen_enc=qwen, entity_enc=entity,
+            mode=args.mode, top_k=top_k,
+            alpha_tfidf=cfg.alpha_tfidf, alpha_qwen=cfg.alpha_qwen, alpha_entity=cfg.alpha_entity,
+        )
+
+    # Chế độ tự nhập history -> candidate là toàn bộ news.
+    if args.history:
+        if args.mode in ('tfidf', 'hybrid'):
+            print('[Cảnh báo] mode tfidf/hybrid chấm trên TOÀN BỘ news rất tốn RAM; '
+                  'nên dùng --mode qwen, hoặc dùng --user-index để giới hạn candidate.')
+        history = args.history.split()
+        _show(news_dict, history, rec(history, list(news_dict.keys())))
+        return
+
+    # Chế độ theo user trong dev: candidate = danh sách impression của user (nhỏ, an toàn).
+    behaviors = load_behaviors(f'{cfg.dev_dir}/behaviors.tsv')
+    print(f'Đã load {len(behaviors)} behaviors (dev). mode={args.mode}, top_k={top_k}')
+
+    def run_one(idx):
+        s = behaviors[idx]
+        print(f'\n{"=" * 60}\nUser [{idx}]: {s["user_id"]}')
+        _show(news_dict, s['history'], rec(s['history'], s['candidates']))
+        print('=' * 60)
+
+    if args.user_index is not None:
+        run_one(args.user_index)
+        return
+
+    print(f'Nhập index user (0..{len(behaviors) - 1}), "q" để thoát.')
+    while True:
+        raw = input('\nIndex user: ').strip()
+        if raw.lower() in {'q', 'quit', 'exit'}:
+            break
+        if not raw.isdigit() or not (0 <= int(raw) < len(behaviors)):
+            print('Index không hợp lệ.')
+            continue
+        run_one(int(raw))
+
+
+if __name__ == '__main__':
+    main()

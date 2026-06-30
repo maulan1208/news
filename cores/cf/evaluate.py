@@ -81,7 +81,7 @@ def save_results(output, results):
     print(f"Đã lưu run #{run['run_id']} vào {path}")
 
 # đánh giá 
-def evaluate(limit=None, batch_size=config.EVAL_BATCH_SIZE, output="results.json"):
+def evaluate(limit=None, batch_size=config.EVAL_BATCH_SIZE, output="resultsmf.json"):
     df = pd.read_csv(config.DEV_BEHAVIORS, sep="\t", header=None, names=BEHAVIOR_COLUMNS)
     if limit:
         df = df.head(limit)
